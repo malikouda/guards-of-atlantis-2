@@ -1,23 +1,11 @@
-import logo from './logo.svg';
-import './App.css';
+import HexGrid from './map/HexGrid';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+      <HexGrid />
+      </svg>
     </div>
   );
 }
