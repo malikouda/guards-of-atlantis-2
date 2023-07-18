@@ -1,5 +1,5 @@
-import {Hex} from './Hex';
-import {HexComponent} from './HexComponent';
+import {Hex} from "./Hex";
+import {HexComponent} from "./HexComponent";
 
 export function HexGrid() {
   const hexes = [];
@@ -11,10 +11,26 @@ export function HexGrid() {
       hexes.push(new Hex(i, j, -i - j));
     }
   }
+  const line = Hex.lineDraw(hexes[5], hexes[30])
+  console.log(line)
+  const checkHexInLine = (hex) => {
+    for (let h of line) {
+      if (hex.q === h.q && hex.r === h.r && hex.s === h.s) {
+        return true
+      }
+    }
+    return false
+  }
   return (
     <g>
       {hexes.map((hex) => (
-        <HexComponent key={`${hex.q} ${hex.r} ${hex.s}`} q={hex.q} r={hex.r} s={hex.s} />
+        <HexComponent
+          highlight={checkHexInLine(hex)}
+          key={`${hex.q} ${hex.r} ${hex.s}`}
+          q={hex.q}
+          r={hex.r}
+          s={hex.s}
+        />
       ))}
     </g>
   );

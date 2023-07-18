@@ -1,8 +1,7 @@
-import {Point} from './Point';
+import {Point} from "./Point";
 
 export class Hex {
   constructor(q, r, s) {
-    console.assert(q + r + s === 0, 'Invalid hex coordinates');
     this.q = q;
     this.r = r;
     this.s = s;
@@ -42,7 +41,10 @@ export class Hex {
   }
 
   static direction(direction) {
-    console.assert(0 <= direction && direction < 6, 'Direction must be between 0 and 5');
+    console.assert(
+      0 <= direction && direction < 6,
+      "Direction must be between 0 and 5",
+    );
     return this.DIRECTIONS[direction];
   }
 
@@ -50,35 +52,77 @@ export class Hex {
     return this.add(hex, this.direction(direction));
   }
 
-  static to_pixel(layout, hex) {
+  static toPixel(layout, hex) {
     const o = layout.orientation;
     const x = (o.f0 * hex.q + o.f1 * hex.r) * layout.size.x;
     const y = (o.f2 * hex.q + o.f3 * hex.r) * layout.size.y;
     return new Point(x + layout.origin.x, y + layout.origin.y);
   }
 
-  static to_hex(layout, point) {
+  static toHex(layout, point) {
     const o = layout.orientation;
-    const pt = Point((point.x - layout.origin.x) / layout.size.x, (point.y - layout.origin.y) / layout.size.y);
+    const pt = Point(
+      (point.x - layout.origin.x) / layout.size.x,
+      (point.y - layout.origin.y) / layout.size.y,
+    );
     const q = o.b0 * pt.x + o.b1 * pt.y;
     const r = o.b2 * pt.x + o.b3 * pt.y;
     return new Hex(q, r, -q - r);
   }
 
-  static corner_offset(layout, corner) {
+  static cornerOffset(layout, corner) {
     const size = layout.size;
     const angle = 2.0 * Math.PI * (layout.orientation.start_angle + corner) / 6;
     return new Point(size.x * Math.cos(angle), size.y * Math.sin(angle));
   }
 
-  static polygon_corners(layout, hex) {
+  static polygonCorners(layout, hex) {
     let corners = [];
-    const center = this.to_pixel(layout, hex);
+    const center = this.toPixel(layout, hex);
     for (let i = 0; i < 6; i++) {
-      const offset = this.corner_offset(layout, i);
+      const offset = this.cornerOffset(layout, i);
       corners.push(new Point(center.x + offset.x, center.y + offset.y));
     }
     return corners;
+  }
+
+  static round(hex) {
+    let q = Math.round(hex.q);
+    let r = Math.round(hex.r);
+    let s = Math.round(hex.s);
+    const q_diff = Math.abs(q - hex.q);
+    const r_diff = Math.abs(r - hex.r);
+    const s_diff = Math.abs(s - hex.s);
+    if (q_diff > r_diff && q_diff > s_diff) {
+      q = -r - s;
+    } else if (r_diff > s_diff) {
+      r = -q - s;
+    } else {
+      s = -q - r;
+    }
+    return new Hex(q, r, s);
+  }
+
+  static lerp(a, b, t) {
+    return a * (1 - t) + b * t;
+  }
+
+  static hexLerp(a, b, t) {
+    return new Hex(
+      this.lerp(a.q, b.q, t),
+      this.lerp(a.r, b.r, t),
+      this.lerp(a.s, b.s, t),
+    );
+  }
+
+  static lineDraw(a, b) {
+    const dist = this.distance(a, b);
+    let results = [];
+    const step = 1.0 / Math.max(dist, 1);
+    for (let i = 0; i <= dist; i++) {
+      results.push(this.round(this.hexLerp(a, b, step * i)));
+    }
+    return results;
   }
 }
 export default Hex;

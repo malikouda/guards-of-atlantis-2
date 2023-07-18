@@ -1,9 +1,10 @@
 import HexGrid from './map/HexGrid';
+import './App.css'
 
 function App() {
   return (
-    <div>
-      <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+    <div className='exactCenter'>
+      <svg align="center" viewBox="-250 -250 500 500" xmlns="http://www.w3.org/2000/svg">
       <HexGrid />
       </svg>
     </div>
