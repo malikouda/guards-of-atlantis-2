@@ -4,7 +4,7 @@ import {Zones} from "./Zones";
 
 export function HexGrid() {
   const hexes = [];
-  for (let q = -11; q <= 11; q++) {
+  for (let q = -11; q <= 10; q++) {
     const qOffset = Math.floor(q / 2.0);
     for (let r = -8 - qOffset; r <= 8 - qOffset; r++) {
       const s = -q - r;
