@@ -1,31 +1,39 @@
 import {Hex} from "./Hex";
 import {HexComponent} from "./HexComponent";
+import {Zones} from "./Zones";
 
 export function HexGrid() {
   const hexes = [];
-  for (let i = -5; i < 6; i++) {
-    for (let j = -5; j < 6; j++) {
-      if (-i - j >= 6 || -i - j <= -6) {
-        continue;
-      }
-      hexes.push(new Hex(i, j, -i - j));
+  for (let q = -11; q <= 11; q++) {
+    const qOffset = Math.floor(q / 2.0);
+    for (let r = -8 - qOffset; r <= 8 - qOffset; r++) {
+      const s = -q - r;
+      hexes.push(new Hex(q, r, s));
     }
   }
-  const line = Hex.lineDraw(hexes[5], hexes[30])
-  console.log(line)
-  const checkHexInLine = (hex) => {
-    for (let h of line) {
-      if (hex.q === h.q && hex.r === h.r && hex.s === h.s) {
-        return true
+  const mapHexToColor = (hex) => {
+    const key = `${hex.q},${hex.r},${hex.s}`;
+    for (let zone of Object.keys(Zones)) {
+      if (Zones[zone].hexes.includes(key)) {
+        return Zones[zone].color;
+      } else {
+        const columns = Zones[zone].columns;
+        const column = columns.find(
+          (col) =>
+            hex.q === col.q && hex.r >= col.r.start && hex.r <= col.r.end,
+        );
+        if (column) {
+          return Zones[zone].color;
+        }
       }
     }
-    return false
-  }
+    return "transparent";
+  };
   return (
     <g>
       {hexes.map((hex) => (
         <HexComponent
-          highlight={checkHexInLine(hex)}
+          zoneColor={mapHexToColor(hex)}
           key={`${hex.q} ${hex.r} ${hex.s}`}
           q={hex.q}
           r={hex.r}
